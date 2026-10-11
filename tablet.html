@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KINSHOMAT — iPad & Tablet Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #040711;
+      --card-bg: rgba(14, 23, 46, 0.65);
+      --card-border: rgba(93, 114, 191, 0.25);
+      --accent-glow: #738aff;
+      --accent-soft: #a5b4fc;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(30, 48, 100, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(60, 40, 110, 0.3) 0%, transparent 55%),
+        radial-gradient(circle at 50% 50%, rgba(8, 14, 30, 0.85) 0%, var(--bg-dark) 100%);
+    }
+
+    #tabletCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* iPad Navigation Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(4, 7, 17, 0.8);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      box-shadow: 0 0 15px rgba(115, 138, 255, 0.3);
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      letter-spacing: 3px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .tablet-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: rgba(115, 138, 255, 0.15);
+      border: 1px solid rgba(115, 138, 255, 0.3);
+      color: var(--accent-soft);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .audio-pill {
+      background: rgba(14, 23, 46, 0.85);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-soft);
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    /* Tablet Navigation Segmented Control */
+    .tab-bar {
+      display: flex;
+      background: rgba(8, 14, 30, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 5px;
+      margin: 1.5rem 2rem 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 12px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn.active {
+      background: rgba(115, 138, 255, 0.2);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Tablet Container */
+    main {
+      position: relative;
+      z-index: 10;
+      padding: 1.8rem 2rem 5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .tab-content {
+      display: none;
+      animation: tabFadeIn 0.35s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* 1. Vista Santuario */
+    .sanctuary-header {
+      text-align: center;
+      padding: 1.5rem 1rem 2rem;
+    }
+
+    .sanctuary-header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .sanctuary-header p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 680px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .journal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      margin-bottom: 1.8rem;
+    }
+
+    .journal-card h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.35rem;
+      color: #fff;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .journal-card p {
+      font-size: 0.98rem;
+      line-height: 1.75;
+      color: #cbd5e1;
+    }
+
+    /* 2. Vista Vacío / Desahogo */
+    .void-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .void-box textarea {
+      width: 100%;
+      height: 160px;
+      background: rgba(4, 7, 17, 0.75);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: #fff;
+      padding: 1.2rem;
+      font-family: inherit;
+      font-size: 1.05rem;
+      outline: none;
+      resize: none;
+      margin-top: 1rem;
+    }
+
+    .void-box textarea:focus {
+      border-color: var(--accent-glow);
+    }
+
+    .tablet-action-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #324484 0%, #1e2852 100%);
+      border: 1px solid rgba(165, 180, 252, 0.3);
+      color: #fff;
+      padding: 14px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 1.2rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .tablet-action-btn:active {
+      transform: scale(0.98);
+    }
+
+    #tabletDissolveCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    /* 3. Vista Test */
+    .quiz-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 2.2rem;
+    }
+
+    .quiz-q-title {
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-bottom: 1.4rem;
+      line-height: 1.6;
+    }
+
+    .tablet-option-btn {
+      width: 100%;
+      background: rgba(8, 14, 30, 0.75);
+      border: 1px solid var(--card-border);
+      padding: 15px 18px;
+      border-radius: 12px;
+      color: #cbd5e1;
+      font-size: 0.98rem;
+      text-align: left;
+      margin-bottom: 12px;
+      cursor: pointer;
+      display: block;
+      transition: all 0.2s;
+    }
+
+    .tablet-option-btn:active {
+      background: rgba(30, 48, 100, 0.6);
+      color: #fff;
+      border-color: var(--accent-soft);
+    }
+
+    /* 4. Vista Constelación */
+    .echo-grid-tablet {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+
+    .echo-item {
+      background: rgba(6, 11, 24, 0.75);
+      border: 1px solid var(--card-border);
+      padding: 1.4rem;
+      border-radius: 14px;
+    }
+
+    .echo-item .time {
+      font-size: 0.75rem;
+      color: var(--accent-soft);
+      margin-bottom: 0.6rem;
+    }
+
+    .echo-item .text {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: #cbd5e1;
+    }
+
+    @keyframes tabFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="tabletCanvas"></canvas>
+
+  <header>
+    <div class="brand">
+      <img src="logo.svg" alt="KINSHOMAT">
+      <span class="brand-title">KINSHOMAT</span>
+      <span class="tablet-badge">iPad Edition</span>
+    </div>
+
+    <div class="header-actions">
+      <div class="audio-pill" id="tabletAudioBtn">
+        <span id="tabletAudioIcon">🌧️</span>
+        <span id="tabletAudioLabel">Sonido Nocturno</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Segmented Tabs for iPad -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('sanctuary', this)">
+      <span>🏛️</span> Santuario
+    </button>
+    <button class="tab-btn" onclick="switchTab('void', this)">
+      <span>🌌</span> El Vacío
+    </button>
+    <button class="tab-btn" onclick="switchTab('quiz', this)">
+      <span>🧭</span> Test del Eco
+    </button>
+    <button class="tab-btn" onclick="switchTab('echoes', this)">
+      <span>✨</span> Constelación
+    </button>
+  </div>
+
+  <main>
+    <!-- TAB 1: SANTUARIO -->
+    <section id="tab-sanctuary" class="tab-content active">
+      <div class="sanctuary-header">
+        <h1>Lo que sentimos, lo que callamos, lo que compartimos.</h1>
+        <p>
+          Un rincón diseñado para la serenidad de tu pantalla. Para leer despacio, pausar el ruido del día y dar lugar a lo que llevas en silencio.
+        </p>
+      </div>
+
+      <div class="journal-card">
+        <h3><span>🕯️</span> Para las horas silenciosas</h3>
+        <p>
+          Hay días en los que hablas con muchas personas pero sientes que no dijiste nada importante. Te guardas las dudas, el cansancio y esos recuerdos que siguen doliendo en silencio. KINSHOMAT nació para que no tengas que fingir que todo está resuelto.
+        </p>
+      </div>
+
+      <div class="journal-card">
+        <h3><span>🌧️</span> Una promesa sencilla</h3>
+        <p>
+          Aquí no hay métricas de popularidad, ni prisa por consumir contenido. Tómate el tiempo de explorar el ritual del vacío o el test del eco nocturno. Este espacio se construyó para acompañarte.
+        </p>
+      </div>
+    </section>
+
+    <!-- TAB 2: EL VACÍO (Ritual) -->
+    <section id="tab-void" class="tab-content">
+      <div class="void-box">
+        <canvas id="tabletDissolveCanvas"></canvas>
+        <h2 style="font-family: 'Cinzel', serif; font-size: 1.5rem; margin-bottom: 0.5rem;">🌌 El Susurro del Vacío</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+          Escribe lo que hoy pesa en tu pecho. Al tocar "Soltar en la noche", tus palabras se convertirán en luz y se desvanecerán en la oscuridad. Nada se almacena.
+        </p>
+
+        <textarea id="tabletVoidText" placeholder="Escribe aquí ese pensamiento que te cuesta decir en voz alta..."></textarea>
+
+        <button class="tablet-action-btn" id="tabletDissolveBtn">
+          <span>✨</span> Soltar en la noche
+        </button>
+
+        <div id="tabletReassurance" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(115, 138, 255, 0.12); border-radius: 10px; color: #c7d2fe; text-align: center; font-size: 0.95rem;">
+          Tus palabras se han disuelto en las estrellas. Ya no tienes que cargar con ellas. Respira profundo.
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: TEST DEL ECO -->
+    <section id="tab-quiz" class="tab-content">
+      <div class="quiz-card">
+        <div id="tQuizContainer">
+          <div style="color: var(--accent-soft); font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 0.6rem;" id="tQuizProgressText">PREGUNTA 1 DE 5</div>
+          <div class="quiz-q-title" id="tQuizTitle">Cargando...</div>
+          <div id="tQuizOptions"></div>
+        </div>
+
+        <div id="tQuizResult" style="display: none; text-align: center; padding: 1rem 0;">
+          <div style="font-size: 2.8rem; margin-bottom: 12px;" id="tArchIcon">🌙</div>
+          <h2 style="font-family: 'Cinzel', serif; font-size: 1.7rem; color: #fff; margin-bottom: 0.8rem;" id="tArchTitle"></h2>
+          <p style="color: var(--text-muted); line-height: 1.75; font-size: 1rem; margin-bottom: 1.5rem;" id="tArchDesc"></p>
+          <button class="tablet-action-btn" style="max-width: 280px; margin: 0 auto;" onclick="tResetQuiz()">
+            <span>↺</span> Repetir el test
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: CONSTELACIÓN -->
+    <section id="tab-echoes" class="tab-content">
+      <h2 style="font-family: 'Cinzel', serif; font-size: 1.5rem; margin-bottom: 0.5rem;">✨ Ecos Anónimos</h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Palabras dejadas por personas que también se sentían solas esta noche.
+      </p>
+
+      <div class="echo-grid-tablet" id="tEchoGrid"></div>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 10px;">
+        <input type="text" id="tNewEcho" style="flex: 1; background: rgba(8, 14, 30, 0.8); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px 16px; color: #fff; font-family: inherit; outline: none;" placeholder="Escribe un pensamiento para la noche...">
+        <button class="tablet-action-btn" id="tAddEchoBtn" style="width: auto; margin-top: 0; padding: 0 20px;">
+          <span>✧</span> Enviar
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // --- 1. DETECCIÓN Y REDIMENSIONAMIENTO ---
+    function checkTabletViewport() {
+      const width = window.innerWidth;
+      if (width < 768) {
+        window.location.replace('mobile.html');
+      } else if (width > 1024) {
+        window.location.replace('desktop.html');
+      }
+    }
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(checkTabletViewport, 250);
+    });
+
+    // --- 2. GESTIÓN DE TABS ---
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    // --- 3. ESTRELLAS DE FONDO CANVAS ---
+    const canvas = document.getElementById('tabletCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function initTabletStars() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      stars = [];
+      for (let i = 0; i < 70; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 1.5 + 0.5,
+          alpha: Math.random() * 0.7 + 0.2,
+          speed: Math.random() * 0.006 + 0.002
+        });
+      }
+    }
+    initTabletStars();
+    window.addEventListener('resize', initTabletStars);
+
+    function animateTabletStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.alpha += Math.sin(Date.now() * s.speed) * 0.006;
+        if (s.alpha < 0.15) s.alpha = 0.15;
+        if (s.alpha > 0.85) s.alpha = 0.85;
+        ctx.fillStyle = `rgba(180, 200, 255, ${s.alpha})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      requestAnimationFrame(animateTabletStars);
+    }
+    animateTabletStars();
+
+    // --- 4. SONIDO AMBIENTAL (Web Audio API) ---
+    let tAudioCtx = null;
+    let tRainGain = null;
+    let tIsPlaying = false;
+
+    function toggleTabletAudio() {
+      if (!tAudioCtx) {
+        tAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (tAudioCtx.state === 'suspended') {
+        tAudioCtx.resume();
+      }
+
+      if (!tIsPlaying) {
+        const bufferSize = tAudioCtx.sampleRate * 2;
+        const noiseBuffer = tAudioCtx.createBuffer(1, bufferSize, tAudioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        let b0 = 0, b1 = 0, b2 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          output[i] = (b0 + b1 + b2) * 0.11;
+        }
+
+        const whiteNoise = tAudioCtx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+        whiteNoise.loop = true;
+
+        const filter = tAudioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(750, tAudioCtx.currentTime);
+
+        tRainGain = tAudioCtx.createGain();
+        tRainGain.gain.setValueAtTime(0.01, tAudioCtx.currentTime);
+        tRainGain.gain.exponentialRampToValueAtTime(0.18, tAudioCtx.currentTime + 1.5);
+
+        whiteNoise.connect(filter);
+        filter.connect(tRainGain);
+        tRainGain.connect(tAudioCtx.destination);
+        whiteNoise.start(0);
+
+        tIsPlaying = true;
+        document.getElementById('tabletAudioIcon').textContent = '🌧️';
+        document.getElementById('tabletAudioLabel').textContent = 'Lluvia activa';
+      } else {
+        if (tRainGain) {
+          tRainGain.gain.exponentialRampToValueAtTime(0.0001, tAudioCtx.currentTime + 0.8);
+          setTimeout(() => {
+            tIsPlaying = false;
+            document.getElementById('tabletAudioIcon').textContent = '🔇';
+            document.getElementById('tabletAudioLabel').textContent = 'Sonido pausado';
+          }, 800);
+        }
+      }
+    }
+    document.getElementById('tabletAudioBtn').addEventListener('click', toggleTabletAudio);
+
+    // Chime sonoro estelar
+    function playTabletChime() {
+      if (!tAudioCtx) {
+        tAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      const osc = tAudioCtx.createOscillator();
+      const gain = tAudioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(528, tAudioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, tAudioCtx.currentTime + 1.2);
+      gain.gain.setValueAtTime(0.12, tAudioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, tAudioCtx.currentTime + 1.4);
+      osc.connect(gain);
+      gain.connect(tAudioCtx.destination);
+      osc.start();
+      osc.stop(tAudioCtx.currentTime + 1.4);
+    }
+
+    // --- 5. RITUAL DEL VACÍO (Disolución) ---
+    const tDissolveBtn = document.getElementById('tabletDissolveBtn');
+    const tVoidText = document.getElementById('tabletVoidText');
+    const tDCanvas = document.getElementById('tabletDissolveCanvas');
+    const tdCtx = tDCanvas.getContext('2d');
+    const tReassurance = document.getElementById('tabletReassurance');
+
+    tDissolveBtn.addEventListener('click', () => {
+      const val = tVoidText.value.trim();
+      if (!val) {
+        tVoidText.focus();
+        return;
+      }
+
+      playTabletChime();
+      tDCanvas.style.display = 'block';
+      tDCanvas.width = tVoidText.parentElement.clientWidth;
+      tDCanvas.height = tVoidText.parentElement.clientHeight;
+
+      const particles = [];
+      for (let i = 0; i < 60; i++) {
+        particles.push({
+          x: Math.random() * tDCanvas.width,
+          y: tDCanvas.height * 0.5 + Math.random() * 40,
+          vx: (Math.random() - 0.5) * 2,
+          vy: -(Math.random() * 2.8 + 1.2),
+          size: Math.random() * 2.5 + 1,
+          alpha: 1,
+          color: Math.random() > 0.5 ? '#a5b4fc' : '#c7d2fe'
+        });
+      }
+
+      tVoidText.value = '';
+      tVoidText.disabled = true;
+
+      function renderTParticles() {
+        tdCtx.clearRect(0, 0, tDCanvas.width, tDCanvas.height);
+        let active = false;
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha -= 0.018;
+          if (p.alpha > 0) {
+            active = true;
+            tdCtx.fillStyle = p.color;
+            tdCtx.globalAlpha = p.alpha;
+            tdCtx.beginPath();
+            tdCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            tdCtx.fill();
+          }
+        });
+        tdCtx.globalAlpha = 1;
+        if (active) {
+          requestAnimationFrame(renderTParticles);
+        } else {
+          tDCanvas.style.display = 'none';
+          tVoidText.disabled = false;
+          tReassurance.style.display = 'block';
+          setTimeout(() => { tReassurance.style.display = 'none'; }, 7000);
+        }
+      }
+      renderTParticles();
+    });
+
+    // --- 6. TEST DEL ECO ---
+    const tQuizData = [
+      {
+        question: "1. ¿Qué sueles hacer cuando el ruido del día termina y te quedas a solas con tus pensamientos?",
+        options: [
+          { text: "Me pierdo en la música o sonidos que tranquilicen mi mente.", score: "musica" },
+          { text: "Repaso recuerdos de personas y momentos del pasado.", score: "memoria" },
+          { text: "Me guardo todo para mí y espero conciliar el sueño.", score: "silencio" },
+          { text: "Siento ganas de escribirle a alguien que entienda lo que siento.", score: "conexion" }
+        ]
+      },
+      {
+        question: "2. Si pudieras decirle algo sin miedo a una persona importante, ¿qué sería?",
+        options: [
+          { text: "«Me dolió que te fueras como si nada hubiera importado».", score: "memoria" },
+          { text: "«No siempre soy tan fuerte como aparento».", score: "silencio" },
+          { text: "«Ojalá supieras lo mucho que te extraño en silencio».", score: "conexion" },
+          { text: "«Gracias por haberme enseñado a sentir con verdad».", score: "musica" }
+        ]
+      },
+      {
+        question: "3. ¿Cuál de estos silencios te resulta más familiar?",
+        options: [
+          { text: "El silencio de una habitación cuando todos duermen.", score: "silencio" },
+          { text: "El silencio después de una despedida que sabías definitiva.", score: "memoria" },
+          { text: "El silencio cuando estás rodeado de gente pero te sientes solo.", score: "conexion" },
+          { text: "El silencio antes de que comience una canción que amas.", score: "musica" }
+        ]
+      },
+      {
+        question: "4. ¿Qué es lo más difícil de explicar sobre tus emociones?",
+        options: [
+          { text: "Que no estoy triste por algo puntual, simplemente siento demasiado.", score: "musica" },
+          { text: "Que me cuesta pedir ayuda cuando más la necesito.", score: "silencio" },
+          { text: "Que sigo esperando que alguien note lo que no digo.", score: "conexion" },
+          { text: "Que no puedo olvidar lo que otros ya superaron.", score: "memoria" }
+        ]
+      },
+      {
+        question: "5. ¿Qué buscas encontrar al visitar KINSHOMAT?",
+        options: [
+          { text: "Un refugio donde no tenga que demostrar nada a nadie.", score: "silencio" },
+          { text: "Saber que hay otros corazones sintiendo cosas parecidas.", score: "conexion" },
+          { text: "Un rincón para honrar la nostalgia con ternura.", score: "memoria" },
+          { text: "Paz, introspección y belleza en medio de la soledad.", score: "musica" }
+        ]
+      }
+    ];
+
+    let tCurrentQ = 0;
+    let tScores = { silencio: 0, memoria: 0, conexion: 0, musica: 0 };
+
+    function loadTabletQuiz() {
+      const q = tQuizData[tCurrentQ];
+      document.getElementById('tQuizTitle').textContent = q.question;
+      document.getElementById('tQuizProgressText').textContent = `PREGUNTA ${tCurrentQ + 1} DE ${tQuizData.length}`;
+
+      const optBox = document.getElementById('tQuizOptions');
+      optBox.innerHTML = '';
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'tablet-option-btn';
+        btn.textContent = opt.text;
+        btn.onclick = () => {
+          tScores[opt.score]++;
+          tCurrentQ++;
+          if (tCurrentQ < tQuizData.length) {
+            loadTabletQuiz();
+          } else {
+            showTabletQuizResult();
+          }
+        };
+        optBox.appendChild(btn);
+      });
+    }
+
+    function showTabletQuizResult() {
+      document.getElementById('tQuizContainer').style.display = 'none';
+      const res = document.getElementById('tQuizResult');
+      res.style.display = 'block';
+
+      let topK = 'silencio';
+      let maxS = -1;
+      for (const k in tScores) {
+        if (tScores[k] > maxS) {
+          maxS = tScores[k];
+          topK = k;
+        }
+      }
+
+      const map = {
+        silencio: {
+          icon: "🌙",
+          title: "El Guardián del Silencio",
+          desc: "Guardas tanto dentro para cuidar a otros que a veces te olvidas de cuidar de ti. En este espacio tus silencios son comprendidos y respetados."
+        },
+        memoria: {
+          icon: "🕯️",
+          title: "El Peregrino de los Recuerdos",
+          desc: "Tienes una memoria que ama intensamente. Guardar recuerdos no es quedarte en el pasado, es haber vivido con el corazón abierto."
+        },
+        conexion: {
+          icon: "🌌",
+          title: "El Faro Invisible",
+          desc: "Tu mayor deseo es ser comprendido tal y como eres, sin máscaras. En KINSHOMAT descubres que quienes sienten como tú también están aquí."
+        },
+        musica: {
+          icon: "🌊",
+          title: "La Marea Serena",
+          desc: "Sientes el mundo con una profundidad que pocos logran apreciar. Tu sensibilidad es tu refugio, tu verdad y tu luz."
+        }
+      };
+
+      const item = map[topK];
+      document.getElementById('tArchIcon').textContent = item.icon;
+      document.getElementById('tArchTitle').textContent = item.title;
+      document.getElementById('tArchDesc').textContent = item.desc;
+    }
+
+    function tResetQuiz() {
+      tCurrentQ = 0;
+      tScores = { silencio: 0, memoria: 0, conexion: 0, musica: 0 };
+      document.getElementById('tQuizResult').style.display = 'none';
+      document.getElementById('tQuizContainer').style.display = 'block';
+      loadTabletQuiz();
+    }
+    loadTabletQuiz();
+
+    // --- 7. ECOS ANÓNIMOS ---
+    const tEchoes = [
+      { time: "01:15 AM", text: "Es un alivio encontrar un sitio donde no te piden sonreír a la fuerza." },
+      { time: "02:50 AM", text: "A veces la persona a la que más extrañas es a la versión de ti de hace unos años." },
+      { time: "04:12 AM", text: "Ojalá aprendamos a valorar a quienes están con nosotros antes de que se vuelvan recuerdos." },
+      { time: "11:30 PM", text: "La noche tiene la virtud de desarmar todas las mentiras que nos contamos de día." }
+    ];
+
+    const tEchoGrid = document.getElementById('tEchoGrid');
+    function renderTabletEchoes() {
+      tEchoGrid.innerHTML = '';
+      tEchoes.forEach(e => {
+        const d = document.createElement('div');
+        d.className = 'echo-item';
+        d.innerHTML = `<div class="time">✦ ${e.time}</div><div class="text">«${e.text}»</div>`;
+        tEchoGrid.appendChild(d);
+      });
+    }
+    renderTabletEchoes();
+
+    document.getElementById('tAddEchoBtn').addEventListener('click', () => {
+      const inp = document.getElementById('tNewEcho');
+      const val = inp.value.trim();
+      if (!val) return;
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      tEchoes.unshift({ time: timeStr, text: val });
+      renderTabletEchoes();
+      inp.value = '';
+    });
+  </script>
+</body>
+</html>

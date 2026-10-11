@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KINSHOMAT — Mac & Desktop Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #040711;
+      --bg-midnight: #080e1e;
+      --card-bg: rgba(14, 23, 46, 0.55);
+      --card-border: rgba(93, 114, 191, 0.22);
+      --accent-glow: #738aff;
+      --accent-soft: #a5b4fc;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(30, 48, 100, 0.35) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(60, 40, 110, 0.25) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(8, 14, 30, 0.8) 0%, var(--bg-dark) 100%);
+    }
+
+    /* Ambient Canvas for Night Particles */
+    #nightCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Navigation bar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(4, 7, 17, 0.7);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    .brand img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(115, 138, 255, 0.35);
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      letter-spacing: 4px;
+      font-weight: 700;
+      color: #f8fafc;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .device-badge {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: rgba(115, 138, 255, 0.12);
+      border: 1px solid rgba(115, 138, 255, 0.3);
+      color: var(--accent-soft);
+      margin-left: 6px;
+    }
+
+    nav {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    nav button {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 10px;
+      transition: all 0.25s ease;
+    }
+
+    nav button:hover, nav button.active {
+      color: #fff;
+      background: rgba(115, 138, 255, 0.14);
+      box-shadow: 0 0 12px rgba(115, 138, 255, 0.2);
+    }
+
+    /* Ambient Audio Controls */
+    .audio-dock {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(14, 23, 46, 0.7);
+      padding: 6px 14px;
+      border-radius: 30px;
+      border: 1px solid var(--card-border);
+    }
+
+    .audio-btn {
+      background: transparent;
+      border: none;
+      color: var(--accent-soft);
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .audio-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Main Container */
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 1380px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 3rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3.5rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      color: var(--accent-soft);
+      margin-bottom: 1.2rem;
+      opacity: 0.85;
+    }
+
+    .hero h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 2.8rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      line-height: 1.3;
+      margin-bottom: 1.5rem;
+      color: #f1f5f9;
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+
+    .quote-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 1.5rem 2.2rem;
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+      font-style: italic;
+      color: #cbd5e1;
+      font-size: 1rem;
+      display: inline-block;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    /* Grid Layout for Mac: Dual Pane Interaction */
+    .dual-pane {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    .interactive-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 2.2rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1rem;
+    }
+
+    .card-header h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.45rem;
+      color: #f8fafc;
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-tag {
+      font-size: 0.75rem;
+      background: rgba(115, 138, 255, 0.15);
+      color: var(--accent-soft);
+      padding: 4px 10px;
+      border-radius: 12px;
+      letter-spacing: 1px;
+    }
+
+    /* 1. Juego Interactivo: El Ritual del Vacío */
+    .void-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .void-textarea {
+      width: 100%;
+      height: 140px;
+      background: rgba(4, 7, 17, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: var(--text-main);
+      padding: 1.2rem;
+      font-family: inherit;
+      font-size: 1rem;
+      resize: none;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .void-textarea:focus {
+      border-color: var(--accent-glow);
+      box-shadow: 0 0 15px rgba(115, 138, 255, 0.25);
+    }
+
+    .void-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .void-hint {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+    }
+
+    .action-btn {
+      background: linear-gradient(135deg, #324484 0%, #1e2852 100%);
+      border: 1px solid rgba(165, 180, 252, 0.3);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .action-btn:hover {
+      background: linear-gradient(135deg, #4359aa 0%, #28366e 100%);
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 20px rgba(115, 138, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Dissolve Animation Canvas */
+    #dissolveCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: none;
+      z-index: 20;
+    }
+
+    .reassurance-msg {
+      display: none;
+      margin-top: 1.2rem;
+      padding: 1rem;
+      background: rgba(115, 138, 255, 0.1);
+      border-left: 3px solid var(--accent-soft);
+      border-radius: 6px;
+      font-size: 0.92rem;
+      color: #c7d2fe;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    /* 2. Test Emocional: El Eco de Medianoche */
+    .quiz-question {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 1.2rem;
+      color: #f1f5f9;
+      line-height: 1.5;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .quiz-option {
+      background: rgba(8, 14, 30, 0.7);
+      border: 1px solid var(--card-border);
+      padding: 12px 18px;
+      border-radius: 10px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.92rem;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--accent-soft);
+      background: rgba(30, 48, 100, 0.4);
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    .quiz-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 20%;
+      background: var(--accent-glow);
+      transition: width 0.3s ease;
+    }
+
+    .quiz-result {
+      display: none;
+      text-align: center;
+      padding: 1rem 0;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .archetype-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      color: #f8fafc;
+      margin-bottom: 0.6rem;
+      text-shadow: 0 0 15px rgba(115, 138, 255, 0.4);
+    }
+
+    .archetype-desc {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* 3. Constelación de Ecos Anónimos (Widescreen Experience) */
+    .constellation-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+    }
+
+    .constellation-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 1.8rem;
+    }
+
+    .echo-card {
+      background: rgba(5, 9, 20, 0.7);
+      border: 1px solid rgba(93, 114, 191, 0.18);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .echo-card:hover {
+      border-color: var(--accent-soft);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(115, 138, 255, 0.15);
+      background: rgba(14, 23, 46, 0.85);
+    }
+
+    .echo-time {
+      font-size: 0.75rem;
+      color: var(--accent-soft);
+      letter-spacing: 1px;
+      margin-bottom: 0.8rem;
+    }
+
+    .echo-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    .add-echo-box {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .add-echo-input {
+      flex: 1;
+      background: rgba(4, 7, 17, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      color: #fff;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .add-echo-input:focus {
+      border-color: var(--accent-glow);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 2.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(4, 7, 17, 0.8);
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-left: 1.5rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-soft);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="nightCanvas"></canvas>
+
+  <header>
+    <div class="brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+      <img src="logo.svg" alt="KINSHOMAT">
+      <span class="brand-title">KINSHOMAT</span>
+      <span class="device-badge">Mac / Desktop</span>
+    </div>
+
+    <nav>
+      <button class="active" onclick="scrollToSection('hero')">Santuario</button>
+      <button onclick="scrollToSection('void-game')">El Vacío</button>
+      <button onclick="scrollToSection('quiz-section')">Test del Eco</button>
+      <button onclick="scrollToSection('constellation')">Constelación</button>
+    </nav>
+
+    <div class="audio-dock">
+      <button class="audio-btn" id="audioToggle" title="Activar/Desactivar Lluvia & Viento Nocturno">🌧️</button>
+      <span class="audio-label" id="audioStatus">Lluvia nocturna: Silencio</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero / Sanctuary Intro -->
+    <section class="hero" id="hero">
+      <p class="hero-eyebrow">Refugio Para Lo Que Llevas Dentro</p>
+      <h1>Lo que sentimos, lo que callamos, lo que compartimos.</h1>
+      <p>
+        No es una página para convencerte de nada, ni para venderte una fórmula mágica. Es un rincón en la noche para respirar sin prisa, soltar pensamientos guardados y descubrir que no estás tan solo como creías.
+      </p>
+      <div class="quote-card">
+        «Hay cosas que guardamos tanto tiempo que olvidamos cómo se siente decirlas en voz alta.»
+      </div>
+    </section>
+
+    <!-- Dual Pane: Interactive Game & Emotional Quiz -->
+    <div class="dual-pane">
+      
+      <!-- Panel 1: Juego del Vacío -->
+      <section class="interactive-card" id="void-game">
+        <canvas id="dissolveCanvas"></canvas>
+        <div class="card-header">
+          <h2><span>🌌</span> El Susurro del Vacío</h2>
+          <span class="card-tag">Ritual de desahogo</span>
+        </div>
+        <p class="void-desc">
+          Escribe aquello que no le has dicho a nadie. Cuando estés listo, suéltalo en la noche: mira cómo tus palabras se desintegran y se convierten en estrellas. Nada queda guardado en ningún servidor.
+        </p>
+        
+        <textarea id="voidText" class="void-textarea" placeholder="Escribe aquí ese pensamiento, recuerdo o silencio..."></textarea>
+        
+        <div class="void-controls">
+          <span class="void-hint">100% privado y efímero</span>
+          <button class="action-btn" id="dissolveBtn">
+            <span>✨</span> Soltar en la noche
+          </button>
+        </div>
+
+        <div class="reassurance-msg" id="reassurance">
+          Tus palabras se han disuelto en la inmensidad. Lo que dolió o pesó ya no está atrapado en tu pecho. Respira.
+        </div>
+      </section>
+
+      <!-- Panel 2: Test Emocional -->
+      <section class="interactive-card" id="quiz-section">
+        <div class="card-header">
+          <h2><span>🧭</span> El Eco de Medianoche</h2>
+          <span class="card-tag">Test introspectivo</span>
+        </div>
+
+        <div id="quizContainer">
+          <div class="quiz-question" id="quizQuestion">Cargando pregunta...</div>
+          <div class="quiz-options" id="quizOptions"></div>
+          
+          <div class="quiz-progress">
+            <span id="quizStep">1 / 5</span>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-result" id="quizResult">
+          <div style="font-size: 2.5rem; margin-bottom: 10px;" id="archetypeIcon">🕯️</div>
+          <h3 class="archetype-title" id="archetypeTitle"></h3>
+          <p class="archetype-desc" id="archetypeDesc"></p>
+          <button class="action-btn" style="margin: 0 auto;" onclick="resetQuiz()">
+            <span>↺</span> Explorar de nuevo
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Constellation Section -->
+    <section class="constellation-section" id="constellation">
+      <div class="card-header">
+        <h2><span>✨</span> Constelación de Ecos Anónimos</h2>
+        <span class="card-tag">Pensamientos compartidos</span>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Voces anónimas que transitan por la misma noche. Toca cualquier eco para reflexionar, o deja una semilla propia.
+      </p>
+
+      <div class="constellation-grid" id="echoGrid">
+        <!-- Ecos dinámicos -->
+      </div>
+
+      <div class="add-echo-box">
+        <input type="text" id="newEchoInput" class="add-echo-input" placeholder="Deja un pensamiento breve para quien visite este cielo en la noche...">
+        <button class="action-btn" id="addEchoBtn">
+          <span>✧</span> Dejar un eco
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-left">
+      <img src="logo.svg" alt="KINSHOMAT" style="width: 24px; height: 24px; opacity: 0.7;">
+      <span>KINSHOMAT © — Un universo para lo que sientes.</span>
+    </div>
+    <div class="footer-links">
+      <span>Versión optimizada para pantallas Mac & Desktop</span>
+    </div>
+  </footer>
+
+  <script>
+    // --- 1. ROUTER DINÁMICO & REDIMENSIONAMIENTO ---
+    function checkViewport() {
+      const width = window.innerWidth;
+      if (width < 768) {
+        window.location.replace('mobile.html');
+      } else if (width >= 768 && width <= 1024) {
+        window.location.replace('tablet.html');
+      }
+    }
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(checkViewport, 250);
+    });
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // --- 2. CANVAS DE ESTRELLAS DE FONDO ---
+    const canvas = document.getElementById('nightCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initStars();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function initStars() {
+      stars = [];
+      const count = Math.floor((canvas.width * canvas.height) / 8000);
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 1.5 + 0.5,
+          alpha: Math.random() * 0.7 + 0.2,
+          speed: Math.random() * 0.005 + 0.002
+        });
+      }
+    }
+    resizeCanvas();
+
+    function animateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.alpha += Math.sin(Date.now() * s.speed) * 0.005;
+        if (s.alpha < 0.1) s.alpha = 0.1;
+        if (s.alpha > 0.8) s.alpha = 0.8;
+        ctx.fillStyle = `rgba(180, 200, 255, ${s.alpha})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+
+    // --- 3. SINTETIZADOR DE LLUVIA & SONIDO AMBIENTAL (Web Audio API) ---
+    let audioCtx = null;
+    let rainGainNode = null;
+    let isAudioPlaying = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function toggleRainAudio() {
+      initAudio();
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      if (!isAudioPlaying) {
+        // Generador de ruido de lluvia suave (White/Pink noise buffer)
+        const bufferSize = audioCtx.sampleRate * 2;
+        const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        let b0 = 0, b1 = 0, b2 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          output[i] = (b0 + b1 + b2) * 0.12;
+        }
+
+        const whiteNoise = audioCtx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+        whiteNoise.loop = true;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, audioCtx.currentTime);
+
+        rainGainNode = audioCtx.createGain();
+        rainGainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
+        rainGainNode.gain.exponentialRampToValueAtTime(0.2, audioCtx.currentTime + 2);
+
+        whiteNoise.connect(filter);
+        filter.connect(rainGainNode);
+        rainGainNode.connect(audioCtx.destination);
+
+        whiteNoise.start(0);
+        isAudioPlaying = true;
+        document.getElementById('audioToggle').textContent = '🌧️';
+        document.getElementById('audioStatus').textContent = 'Lluvia: Envolvente';
+      } else {
+        if (rainGainNode) {
+          rainGainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
+          setTimeout(() => {
+            isAudioPlaying = false;
+            document.getElementById('audioToggle').textContent = '🔇';
+            document.getElementById('audioStatus').textContent = 'Lluvia: Pausada';
+          }, 1000);
+        }
+      }
+    }
+    document.getElementById('audioToggle').addEventListener('click', toggleRainAudio);
+
+    // Sonido estelar al soltar pensamiento
+    function playStarChime() {
+      initAudio();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(528, audioCtx.currentTime); // 528 Hz amor/calma
+      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 1.2);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.5);
+    }
+
+    // --- 4. RITUAL DE DESAHOGO: DISOLVER PENSAMIENTOS AL VACÍO ---
+    const dissolveBtn = document.getElementById('dissolveBtn');
+    const voidText = document.getElementById('voidText');
+    const dissolveCanvas = document.getElementById('dissolveCanvas');
+    const dCtx = dissolveCanvas.getContext('2d');
+    const reassurance = document.getElementById('reassurance');
+
+    dissolveBtn.addEventListener('click', () => {
+      const text = voidText.value.trim();
+      if (!text) {
+        voidText.focus();
+        return;
+      }
+
+      playStarChime();
+      dissolveCanvas.style.display = 'block';
+      dissolveCanvas.width = voidText.parentElement.clientWidth;
+      dissolveCanvas.height = voidText.parentElement.clientHeight;
+
+      const particles = [];
+      for (let i = 0; i < 75; i++) {
+        particles.push({
+          x: Math.random() * dissolveCanvas.width,
+          y: dissolveCanvas.height * 0.5 + Math.random() * 50,
+          vx: (Math.random() - 0.5) * 2,
+          vy: -(Math.random() * 3 + 1.5),
+          size: Math.random() * 2.5 + 1,
+          alpha: 1,
+          color: Math.random() > 0.5 ? '#a5b4fc' : '#c7d2fe'
+        });
+      }
+
+      voidText.value = '';
+      voidText.disabled = true;
+
+      function renderParticles() {
+        dCtx.clearRect(0, 0, dissolveCanvas.width, dissolveCanvas.height);
+        let active = false;
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha -= 0.015;
+          if (p.alpha > 0) {
+            active = true;
+            dCtx.fillStyle = p.color;
+            dCtx.globalAlpha = p.alpha;
+            dCtx.beginPath();
+            dCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            dCtx.fill();
+          }
+        });
+        dCtx.globalAlpha = 1;
+        if (active) {
+          requestAnimationFrame(renderParticles);
+        } else {
+          dissolveCanvas.style.display = 'none';
+          voidText.disabled = false;
+          reassurance.style.display = 'block';
+          setTimeout(() => {
+            reassurance.style.display = 'none';
+          }, 8000);
+        }
+      }
+      renderParticles();
+    });
+
+    // --- 5. TEST INTROSPECTIVO: EL ECO DE MEDIANOCHE ---
+    const quizData = [
+      {
+        question: "1. Cuando sientes que tu mente desborda y nadie lo nota, ¿cuál suele ser tu refugio?",
+        options: [
+          { text: "Me guardo todo y continúo con el día como si nada.", score: "silencio" },
+          { text: "Busco música que entienda lo que no puedo poner en palabras.", score: "musica" },
+          { text: "Escribo, camino o miro la ventana esperando que pase.", score: "memoria" },
+          { text: "Desearía poder hablarlo con alguien sin sentir que incomodo.", score: "conexion" }
+        ]
+      },
+      {
+        question: "2. Si pudieras volver a una hora exacta del pasado, ¿qué buscarías allí?",
+        options: [
+          { text: "La paz de un momento donde no cargaba tantas dudas.", score: "silencio" },
+          { text: "La voz de una persona que ya no está de la misma forma.", score: "memoria" },
+          { text: "Ese instante en el que me sentí verdaderamente comprendido.", score: "conexion" },
+          { text: "Una versión de mí que no tenía tanto miedo de sentir.", score: "musica" }
+        ]
+      },
+      {
+        question: "3. ¿Qué emoción sueles ocultar con mayor cuidado?",
+        options: [
+          { text: "El cansancio de fingir que siempre estoy bien.", score: "silencio" },
+          { text: "La nostalgia por cosas que sé que no volverán.", score: "memoria" },
+          { text: "La necesidad profunda de un abrazo sincero.", score: "conexion" },
+          { text: "Una sensibilidad que el mundo suele llamar debilidad.", score: "musica" }
+        ]
+      },
+      {
+        question: "4. En una noche fría de lluvia, ¿cuál es tu pensamiento recurrente?",
+        options: [
+          { text: "Pensar en cuántas personas estarán sintiéndose igual ahora mismo.", score: "conexion" },
+          { text: "Recordar promesas que se quedaron a medias.", score: "memoria" },
+          { text: "Agradecer el silencio porque de noche no hay que dar explicaciones.", score: "silencio" },
+          { text: "Imaginar historias y universos donde todo tiene sentido.", score: "musica" }
+        ]
+      },
+      {
+        question: "5. ¿Qué significa para ti KINSHOMAT?",
+        options: [
+          { text: "Un lugar para no tener que fingir fortaleza.", score: "silencio" },
+          { text: "El puente para saber que mi soledad no es única.", score: "conexion" },
+          { text: "Un archivo donde honrar lo que fuimos y lo que sentimos.", score: "memoria" },
+          { text: "El espacio para crear arte a partir de lo que duele.", score: "musica" }
+        ]
+      }
+    ];
+
+    let currentQ = 0;
+    let scores = { silencio: 0, memoria: 0, conexion: 0, musica: 0 };
+
+    function loadQuiz() {
+      const q = quizData[currentQ];
+      document.getElementById('quizQuestion').textContent = q.question;
+      document.getElementById('quizStep').textContent = `${currentQ + 1} / ${quizData.length}`;
+      document.getElementById('progressFill').style.width = `${((currentQ + 1) / quizData.length) * 100}%`;
+
+      const optContainer = document.getElementById('quizOptions');
+      optContainer.innerHTML = '';
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.textContent = opt.text;
+        btn.onclick = () => selectOption(opt.score);
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function selectOption(scoreKey) {
+      scores[scoreKey]++;
+      currentQ++;
+      if (currentQ < quizData.length) {
+        loadQuiz();
+      } else {
+        showQuizResult();
+      }
+    }
+
+    function showQuizResult() {
+      document.getElementById('quizContainer').style.display = 'none';
+      const resContainer = document.getElementById('quizResult');
+      resContainer.style.display = 'block';
+
+      // Encontrar el arquetipo ganador
+      let topKey = 'silencio';
+      let maxScore = -1;
+      for (const k in scores) {
+        if (scores[k] > maxScore) {
+          maxScore = scores[k];
+          topKey = k;
+        }
+      }
+
+      const archetypes = {
+        silencio: {
+          icon: "🌙",
+          title: "El Guardián del Silencio",
+          desc: "Guardas universos enteros en tu pecho para no incomodar al resto. Tu fuerza es inmensa, pero no tienes que cargar todo a solas. En KINSHOMAT, tu silencio es escuchado y respetado."
+        },
+        memoria: {
+          icon: "🕯️",
+          title: "El Peregrino de los Recuerdos",
+          desc: "Vives con una profunda sensibilidad hacia los instantes que marcaron tu vida. No tienes miedo de recordar porque sabes que quien recuerda con amor, mantiene vivas las huellas más hermosas."
+        },
+        conexion: {
+          icon: "🌌",
+          title: "El Faro Invisible",
+          desc: "Sientes tanto que a menudo eres tú quien consuela a los demás, incluso cuando eres tú quien necesita un refugio. Tu búsqueda no es la soledad, sino encontrar personas que sepan mirar más allá de la superficie."
+        },
+        musica: {
+          icon: "🌊",
+          title: "La Marea Sensible",
+          desc: "Transformas cada emoción en pensamiento, en arte o en poesía silenciosa. El mundo suele ser ruidoso para tu ritmo, pero tu sensibilidad no es debilidad: es tu brújula más auténtica."
+        }
+      };
+
+      const arch = archetypes[topKey];
+      document.getElementById('archetypeIcon').textContent = arch.icon;
+      document.getElementById('archetypeTitle').textContent = arch.title;
+      document.getElementById('archetypeDesc').textContent = arch.desc;
+    }
+
+    function resetQuiz() {
+      currentQ = 0;
+      scores = { silencio: 0, memoria: 0, conexion: 0, musica: 0 };
+      document.getElementById('quizResult').style.display = 'none';
+      document.getElementById('quizContainer').style.display = 'block';
+      loadQuiz();
+    }
+    loadQuiz();
+
+    // --- 6. CONSTELACIÓN DE ECOS DINÁMICOS ---
+    const initialEchoes = [
+      { time: "02:14 AM", text: "A veces extraño a personas que siguen con vida, pero cuya versión de antes ya no existe." },
+      { time: "03:40 AM", text: "Es curioso cómo una habitación con luz apagada te hace recordar exactamente lo que evitaste todo el día." },
+      { time: "11:58 PM", text: "No quería alejarme, solo me cansé de ser siempre yo quien daba el primer paso para hablar." },
+      { time: "01:22 AM", text: "Me dijeron que sentía demasiado. Ahora sé que sentir no es el error; el error fue rodearme de personas que no sabían escuchar." },
+      { time: "04:05 AM", text: "La lluvia afuera tiene esa virtud extraña: hace que estar solo se sienta como una pausa y no como una condena." },
+      { time: "10:30 PM", text: "Ojalá hubiera un lugar donde pudiéramos coincidir todos los que no sabemos cómo explicar lo que nos pesa hoy." }
+    ];
+
+    const echoGrid = document.getElementById('echoGrid');
+    function renderEchoes() {
+      echoGrid.innerHTML = '';
+      initialEchoes.forEach(e => {
+        const card = document.createElement('div');
+        card.className = 'echo-card';
+        card.innerHTML = `
+          <div class="echo-time">✦ ${e.time}</div>
+          <div class="echo-text">«${e.text}»</div>
+        `;
+        echoGrid.appendChild(card);
+      });
+    }
+    renderEchoes();
+
+    document.getElementById('addEchoBtn').addEventListener('click', () => {
+      const input = document.getElementById('newEchoInput');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      initialEchoes.unshift({ time: timeStr, text: val });
+      renderEchoes();
+      input.value = '';
+    });
+  </script>
+</body>
+</html>

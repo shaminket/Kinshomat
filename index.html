@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KINSHOMAT — Cargando Santuario...</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Plus+Jakarta+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #03050a;
+      color: #e2e8f0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background-image: radial-gradient(circle at center, #0c142b 0%, #03050a 100%);
+    }
+    .loader-box {
+      text-align: center;
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+    .logo-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      box-shadow: 0 0 35px rgba(115, 138, 255, 0.45);
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      letter-spacing: 5px;
+      color: #fff;
+      margin-bottom: 0.8rem;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.02); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader-box">
+    <img src="logo.svg" alt="KINSHOMAT" class="logo-img">
+    <h1>KINSHOMAT</h1>
+    <p id="detectText">Preparando tu refugio nocturno...</p>
+  </div>
+
+  <script>
+    function getTargetVersion() {
+      const width = window.innerWidth;
+      if (width < 768) {
+        return 'mobile.html';
+      } else if (width >= 768 && width <= 1024) {
+        return 'tablet.html';
+      } else {
+        return 'desktop.html';
+      }
+    }
+
+    // Redirección inmediata según viewport
+    const target = getTargetVersion();
+    document.getElementById('detectText').textContent = `Detectando dispositivo (${window.innerWidth}px)...`;
+    window.location.replace(target);
+
+    // Escuchador si el usuario redimensiona antes de redirigir
+    window.addEventListener('resize', () => {
+      window.location.replace(getTargetVersion());
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0e172e"/>
+      <stop offset="60%" stop-color="#070c18"/>
+      <stop offset="100%" stop-color="#03050a"/>
+    </radialGradient>
+    <radialGradient id="crescentGlow" cx="68%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c8d6ff" stop-opacity="0.95"/>
+      <stop offset="35%" stop-color="#738aff" stop-opacity="0.6"/>
+      <stop offset="70%" stop-color="#3b4fa8" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#0b1020" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="outerGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18" result="blur2"/>
+      <feComposite in="SourceGraphic" in2="blur2" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="500" height="500" rx="100" fill="url(#bgGrad)"/>
+
+  <!-- Concentric Orbit Rings -->
+  <circle cx="250" cy="250" r="175" fill="none" stroke="#25355e" stroke-width="1.2" opacity="0.45"/>
+  <circle cx="250" cy="250" r="150" fill="none" stroke="#36497a" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Halo Atmosphere -->
+  <circle cx="250" cy="250" r="115" fill="none" stroke="#5d72bf" stroke-width="12" opacity="0.25" filter="url(#outerGlow)"/>
+
+  <!-- The Eclipse Crescent Light -->
+  <circle cx="250" cy="250" r="102" fill="none" stroke="url(#crescentGlow)" stroke-width="8" filter="url(#softGlow)"/>
+  
+  <!-- Sharp Bright Inner Rim -->
+  <path d="M 250,148 A 102,102 0 0,1 338,200 A 102,102 0 0,1 352,250 A 102,102 0 0,1 338,300 A 102,102 0 0,1 250,352" 
+        fill="none" stroke="#e0e8ff" stroke-width="2.5" stroke-linecap="round" opacity="0.95" filter="url(#softGlow)"/>
+
+  <!-- Dark Core (The Solitude Moon) -->
+  <circle cx="246" cy="250" r="99" fill="#04060b"/>
+
+  <!-- Small Satellite Star on Orbit -->
+  <g transform="translate(366, 172)" filter="url(#softGlow)">
+    <circle cx="0" cy="0" r="3.5" fill="#ffffff"/>
+    <path d="M 0,-8 L 0,8 M -8,0 L 8,0" stroke="#d4e1ff" stroke-width="1.2"/>
+  </g>
+</svg>
